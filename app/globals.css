@@ -24,3 +24,15 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+@layer components {
+  .input {
+    @apply rounded-md border border-black/15 bg-transparent px-3 py-2 text-sm outline-none focus:border-black/40 dark:border-white/20 dark:focus:border-white/50;
+  }
+  .btn-primary {
+    @apply rounded-md bg-foreground px-4 py-2 text-sm font-medium text-background disabled:opacity-50;
+  }
+  .btn-secondary {
+    @apply rounded-md border border-black/15 px-3 py-1.5 text-sm disabled:opacity-50 dark:border-white/20;
+  }
+}
