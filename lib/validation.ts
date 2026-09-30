@@ -77,6 +77,14 @@ export function parseMessageUpdate(input: unknown): Parsed<MessageUpdateInput> {
   return { ok: true, value: { message: message.value, password: password.value } };
 }
 
+export function parsePasswordOnly(input: unknown): Parsed<{ password: string }> {
+  const body = asBody(input);
+  if (!body) return INVALID_BODY;
+  const password = readPassword(body);
+  if (!password.ok) return password;
+  return { ok: true, value: { password: password.value } };
+}
+
 const PG_INT_MAX = 2_147_483_647;
 
 // A route param that is not a positive integer in Postgres `integer` range

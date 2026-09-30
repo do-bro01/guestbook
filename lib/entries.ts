@@ -76,3 +76,7 @@ export async function updateMessage(id: number, message: string): Promise<Entry 
   `) as EntryRow[];
   return rows[0] ? toEntry(rows[0]) : null;
 }
+
+export async function deleteEntry(id: number): Promise<void> {
+  await db()`DELETE FROM entries WHERE id = ${id}`;
+}

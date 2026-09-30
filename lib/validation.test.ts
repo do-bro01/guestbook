@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { parseEntryId, parseMessageUpdate, parseNewEntry } from "./validation";
+import {
+  parseEntryId,
+  parseMessageUpdate,
+  parseNewEntry,
+  parsePasswordOnly,
+} from "./validation";
 
 describe("parseNewEntry", () => {
   it("accepts a valid Entry and trims Author name and Message but not the password", () => {
@@ -71,5 +76,22 @@ describe("parseEntryId", () => {
 
   it.each(["0", "-1", "1.5", "abc", "1e3", "", "01", "99999999999"])("rejects %j", (raw) => {
     expect(parseEntryId(raw)).toBeNull();
+  });
+});
+
+describe("parsePasswordOnly", () => {
+  it("accepts a password as typed", () => {
+    expect(parsePasswordOnly({ password: " abcd" })).toEqual({
+      ok: true,
+      value: { password: " abcd" },
+    });
+  });
+
+  it.each([
+    ["a missing body", null],
+    ["a missing password", {}],
+    ["a password under 4 characters", { password: "abc" }],
+  ])("rejects %s", (_label, body) => {
+    expect(parsePasswordOnly(body).ok).toBe(false);
   });
 });

@@ -33,3 +33,7 @@ export function postEntry(input: { name: string; message: string; password: stri
 export function patchEntry(id: number, input: { message: string; password: string }) {
   return call<Entry>(`/api/entries/${id}`, { method: "PATCH", body: JSON.stringify(input) });
 }
+
+export function deleteEntry(id: number, input: { password: string }) {
+  return call<void>(`/api/entries/${id}`, { method: "DELETE", body: JSON.stringify(input) });
+}

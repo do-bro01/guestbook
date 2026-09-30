@@ -1,7 +1,7 @@
-import { findPasswordHash, updateMessage } from "@/lib/entries";
+import { deleteEntry, findPasswordHash, updateMessage } from "@/lib/entries";
 import { errorResponse, NOT_FOUND, readJson, WRONG_PASSWORD } from "@/lib/http";
 import { verifyPassword } from "@/lib/password";
-import { parseEntryId, parseMessageUpdate } from "@/lib/validation";
+import { parseEntryId, parseMessageUpdate, parsePasswordOnly } from "@/lib/validation";
 
 type Ctx = RouteContext<"/api/entries/[id]">;
 
@@ -26,4 +26,16 @@ export async function PATCH(request: Request, ctx: Ctx) {
   const entry = await updateMessage(id, parsed.value.message);
   if (!entry) return errorResponse(404, NOT_FOUND);
   return Response.json(entry);
+}
+
+// The Entry password comes in the JSON body, even on DELETE (ADR-0004).
+export async function DELETE(request: Request, ctx: Ctx) {
+  const parsed = parsePasswordOnly(await readJson(request));
+  if (!parsed.ok) return errorResponse(400, parsed.error);
+
+  const id = await authorize(ctx, parsed.value.password);
+  if (id instanceof Response) return id;
+
+  await deleteEntry(id);
+  return new Response(null, { status: 204 });
 }

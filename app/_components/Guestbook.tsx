@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import type { Entry } from "@/lib/entries";
-import { fetchEntries } from "./api";
+import { type ApiResult, fetchEntries } from "./api";
 import { EntryForm } from "./EntryForm";
 import { EntryItem } from "./EntryItem";
 
@@ -10,8 +10,7 @@ export function Guestbook() {
   const [entries, setEntries] = useState<Entry[] | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
 
-  const load = useCallback(async () => {
-    const result = await fetchEntries();
+  const apply = useCallback((result: ApiResult<Entry[]>) => {
     if (result.ok) {
       setEntries(result.data);
       setLoadError(null);
@@ -20,9 +19,17 @@ export function Guestbook() {
     }
   }, []);
 
+  const load = useCallback(async () => apply(await fetchEntries()), [apply]);
+
   useEffect(() => {
-    load();
-  }, [load]);
+    let active = true;
+    fetchEntries().then((result) => {
+      if (active) apply(result);
+    });
+    return () => {
+      active = false;
+    };
+  }, [apply]);
 
   return (
     <div className="flex flex-col gap-6">
