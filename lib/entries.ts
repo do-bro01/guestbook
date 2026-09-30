@@ -1,7 +1,7 @@
 import { neon } from "@neondatabase/serverless";
 import { hashPassword } from "./password";
 import type { ReactionKind, ReactionSummary } from "./reaction";
-import type { NewEntryInput } from "./validation";
+import type { NewEntryInput, Sort } from "./validation";
 
 // The only module that talks SQL (ADR-0001). Every read returns the public
 // Entry shape; password_hash is never selected into it.
@@ -50,8 +50,12 @@ function toSummary(row: SummaryRow): ReactionSummary {
   return { likes: row.likes, dislikes: row.dislikes, myReaction: row.my_reaction };
 }
 
-// voterId is null for a browser that has never reacted.
-export async function listEntries(voterId: string | null): Promise<ListedEntry[]> {
+// voterId is null for a browser that has never reacted. "likes" orders by
+// Like count, then newest first; "latest" is newest first only.
+export async function listEntries(
+  voterId: string | null,
+  sort: Sort = "latest",
+): Promise<ListedEntry[]> {
   const rows = (await db()`
     SELECT e.id, e.name, e.message, e.created_at,
            count(r.kind) FILTER (WHERE r.kind = 'like')::int    AS likes,
@@ -60,7 +64,9 @@ export async function listEntries(voterId: string | null): Promise<ListedEntry[]
     FROM entries e
     LEFT JOIN reactions r ON r.entry_id = e.id
     GROUP BY e.id
-    ORDER BY e.created_at DESC, e.id DESC
+    ORDER BY CASE WHEN ${sort}::text = 'likes'
+                  THEN count(r.kind) FILTER (WHERE r.kind = 'like') END DESC NULLS LAST,
+             e.created_at DESC, e.id DESC
   `) as (EntryRow & SummaryRow)[];
   return rows.map((row) => ({ ...toEntry(row), ...toSummary(row) }));
 }

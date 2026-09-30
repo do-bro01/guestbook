@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { MESSAGE_MAX, NAME_MAX, PASSWORD_MIN } from "@/lib/validation";
 import { postEntry } from "./api";
+import { CharCounter, isOverLimit } from "./CharCounter";
 
 export function EntryForm({ onCreated }: { onCreated: () => void }) {
   const [name, setName] = useState("");
@@ -57,12 +58,16 @@ export function EntryForm({ onCreated }: { onCreated: () => void }) {
         className="input min-h-24"
         placeholder={`메시지 (최대 ${MESSAGE_MAX}자)`}
         value={message}
-        maxLength={MESSAGE_MAX}
         onChange={(e) => setMessage(e.target.value)}
         required
       />
+      <CharCounter value={message} max={MESSAGE_MAX} />
       {error && <p className="text-sm text-red-600">{error}</p>}
-      <button type="submit" className="btn-primary self-end" disabled={submitting}>
+      <button
+        type="submit"
+        className="btn-primary self-end"
+        disabled={submitting || isOverLimit(message, MESSAGE_MAX)}
+      >
         {submitting ? "등록 중…" : "등록"}
       </button>
     </form>

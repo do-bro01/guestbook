@@ -41,7 +41,7 @@ export function ReactionButtons({ entry, onReacted }: Props) {
             disabled={busy}
             aria-pressed={pressed}
             title={pressed ? `${label} 취소` : label}
-            className={`reaction ${pressed ? "reaction-pressed" : ""}`}
+            className={`chip ${pressed ? "chip-on" : ""}`}
           >
             <span className="grayscale" aria-hidden>
               {emoji}

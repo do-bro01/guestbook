@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
 import {
+  charLength,
   parseEntryId,
   parseMessageUpdate,
   parseNewEntry,
   parsePasswordOnly,
+  parseSort,
 } from "./validation";
 
 describe("parseNewEntry", () => {
@@ -93,5 +95,27 @@ describe("parsePasswordOnly", () => {
     ["a password under 4 characters", { password: "abc" }],
   ])("rejects %s", (_label, body) => {
     expect(parsePasswordOnly(body).ok).toBe(false);
+  });
+});
+
+describe("parseSort", () => {
+  it("defaults to latest when no sort is given", () => {
+    expect(parseSort(null)).toEqual({ ok: true, value: "latest" });
+  });
+
+  it("accepts latest and likes", () => {
+    expect(parseSort("latest")).toEqual({ ok: true, value: "latest" });
+    expect(parseSort("likes")).toEqual({ ok: true, value: "likes" });
+  });
+
+  it.each(["", "LIKES", "dislikes", "random"])("rejects %j", (raw) => {
+    expect(parseSort(raw).ok).toBe(false);
+  });
+});
+
+describe("charLength", () => {
+  it("counts an emoji or a Korean syllable as one character", () => {
+    expect(charLength("👍👎")).toBe(2);
+    expect(charLength("안녕")).toBe(2);
   });
 });

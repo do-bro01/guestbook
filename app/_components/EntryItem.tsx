@@ -5,13 +5,9 @@ import type { ListedEntry } from "@/lib/entries";
 import type { ReactionSummary } from "@/lib/reaction";
 import { MESSAGE_MAX } from "@/lib/validation";
 import { deleteEntry, patchEntry } from "./api";
+import { CharCounter, isOverLimit } from "./CharCounter";
 import { ReactionButtons } from "./ReactionButtons";
-
-const writtenAtFormat = new Intl.DateTimeFormat("ko-KR", {
-  dateStyle: "medium",
-  timeStyle: "short",
-  timeZone: "Asia/Seoul",
-});
+import { WrittenAt } from "./WrittenAt";
 
 type Mode = "view" | "edit" | "delete";
 
@@ -62,9 +58,7 @@ export function EntryItem({ entry, onChanged, onReacted }: Props) {
     <li className="flex flex-col gap-2 rounded-lg border border-black/10 p-4 dark:border-white/15">
       <div className="flex items-baseline justify-between gap-2">
         <span className="font-semibold">{entry.name}</span>
-        <time className="text-xs text-zinc-500" dateTime={entry.createdAt}>
-          {writtenAtFormat.format(new Date(entry.createdAt))}
-        </time>
+        <WrittenAt iso={entry.createdAt} />
       </div>
 
       {mode === "view" ? (
@@ -85,14 +79,16 @@ export function EntryItem({ entry, onChanged, onReacted }: Props) {
       ) : (
         <form onSubmit={handleSubmit} className="flex flex-col gap-2">
           {mode === "edit" ? (
-            <textarea
-              className="input min-h-20"
-              value={message}
-              maxLength={MESSAGE_MAX}
-              onChange={(e) => setMessage(e.target.value)}
-              aria-label="수정할 메시지"
-              required
-            />
+            <>
+              <textarea
+                className="input min-h-20"
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                aria-label="수정할 메시지"
+                required
+              />
+              <CharCounter value={message} max={MESSAGE_MAX} />
+            </>
           ) : (
             <p className="text-sm">이 글을 삭제하려면 비밀번호를 입력하세요.</p>
           )}
@@ -112,7 +108,11 @@ export function EntryItem({ entry, onChanged, onReacted }: Props) {
             <button type="button" className="btn-secondary" onClick={() => open("view")}>
               취소
             </button>
-            <button type="submit" className="btn-primary" disabled={busy}>
+            <button
+              type="submit"
+              className="btn-primary"
+              disabled={busy || (mode === "edit" && isOverLimit(message, MESSAGE_MAX))}
+            >
               {SUBMIT_LABEL[mode][busy ? 1 : 0]}
             </button>
           </div>

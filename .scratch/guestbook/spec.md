@@ -89,6 +89,12 @@ Requested by the developer after the first release, which reverses the original 
 - `GET /api/entries` adds `likes`, `dislikes` and `myReaction` (`"like" | "dislike" | null`, for the calling Voter) to each Entry.
 - Tested with Vitest: the toggle rule (same → cancel, other → switch, none → set), reaction-kind validation and Voter-id validation. The route and SQL are verified by hand with `curl` using two cookie jars.
 
+## Addendum: Counter, relative time and sorting (added after v1)
+
+- The write form and the edit panel show a live `n / 500` counter under the Message field. It counts characters the same way the server does, so an emoji is 1. Past 500 it is marked "(글자 수 초과)" and the submit button is disabled.
+- Written at is shown relative to now in Korean time ("방금 전", "N분 전", "N시간 전", "어제", "N일 전", then the date after a week) and refreshes every minute. Hovering shows the full date and time.
+- The list has 최신순 (default) and 좋아요순 toggles. `GET /api/entries?sort=latest|likes` sorts on the server (likes: Like count descending, then newest). A missing `sort` means latest and any other value returns 400. Pressing 👍 updates counts in place and does not reorder the list until the next load.
+
 ## Further Notes
 
 - `DATABASE_URL` must be set in Vercel project settings for the deployed app. `.env.local` is never committed (already covered by `.env*` in `.gitignore`).

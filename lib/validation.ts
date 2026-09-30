@@ -11,7 +11,7 @@ export type NewEntryInput = { name: string; message: string; password: string };
 
 type Body = Record<string, unknown>;
 
-const charLength = (s: string) => Array.from(s).length;
+export const charLength = (s: string) => Array.from(s).length;
 
 function asBody(body: unknown): Body | null {
   return typeof body === "object" && body !== null && !Array.isArray(body)
@@ -95,4 +95,15 @@ export function parseEntryId(raw: string): number | null {
   if (!/^[1-9]\d*$/.test(raw)) return null;
   const id = Number(raw);
   return id <= PG_INT_MAX ? id : null;
+}
+
+export const SORTS = ["latest", "likes"] as const;
+export type Sort = (typeof SORTS)[number];
+
+// The `sort` query parameter of GET /api/entries; absent means latest.
+export function parseSort(raw: string | null): Parsed<Sort> {
+  if (raw === null) return { ok: true, value: "latest" };
+  return SORTS.includes(raw as Sort)
+    ? { ok: true, value: raw as Sort }
+    : fail("정렬은 latest 또는 likes만 가능합니다.");
 }

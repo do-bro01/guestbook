@@ -1,6 +1,11 @@
 import type { Entry, ListedEntry } from "@/lib/entries";
 import type { ReactionKind, ReactionSummary } from "@/lib/reaction";
-import type { MessageUpdateInput, NewEntryInput, PasswordOnlyInput } from "@/lib/validation";
+import type {
+  MessageUpdateInput,
+  NewEntryInput,
+  PasswordOnlyInput,
+  Sort,
+} from "@/lib/validation";
 
 // Browser-side client for the Entry API (ADR-0003). Every call resolves to
 // either data or a user-facing error message; it never throws.
@@ -24,8 +29,8 @@ async function call<T>(url: string, init?: RequestInit): Promise<ApiResult<T>> {
   }
 }
 
-export function fetchEntries() {
-  return call<ListedEntry[]>("/api/entries", { cache: "no-store" });
+export function fetchEntries(sort: Sort) {
+  return call<ListedEntry[]>(`/api/entries?sort=${sort}`, { cache: "no-store" });
 }
 
 export function postEntry(input: NewEntryInput) {
