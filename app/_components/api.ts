@@ -29,3 +29,7 @@ export function fetchEntries() {
 export function postEntry(input: { name: string; message: string; password: string }) {
   return call<Entry>("/api/entries", { method: "POST", body: JSON.stringify(input) });
 }
+
+export function patchEntry(id: number, input: { message: string; password: string }) {
+  return call<Entry>(`/api/entries/${id}`, { method: "PATCH", body: JSON.stringify(input) });
+}

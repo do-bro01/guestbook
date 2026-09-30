@@ -58,3 +58,21 @@ export async function createEntry(input: NewEntryInput): Promise<Entry> {
   `) as EntryRow[];
   return toEntry(rows[0]);
 }
+
+// Used only to check an Entry password; the hash never leaves the server.
+export async function findPasswordHash(id: number): Promise<string | null> {
+  const rows = (await db()`
+    SELECT password_hash FROM entries WHERE id = ${id}
+  `) as { password_hash: string }[];
+  return rows[0]?.password_hash ?? null;
+}
+
+// Returns null if the Entry was deleted in the meantime.
+export async function updateMessage(id: number, message: string): Promise<Entry | null> {
+  const rows = (await db()`
+    UPDATE entries SET message = ${message}
+    WHERE id = ${id}
+    RETURNING id, name, message, created_at
+  `) as EntryRow[];
+  return rows[0] ? toEntry(rows[0]) : null;
+}

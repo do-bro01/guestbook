@@ -63,7 +63,7 @@ One page at `/` shows a form for writing an Entry (Author name, Message, Entry p
   - `PATCH /api/entries/{id}` body `{ message, password }` → 200 `Entry` | 400 | 404 | 403.
   - `DELETE /api/entries/{id}` body `{ password }` → 204 | 400 | 404 | 403 (the password goes in the JSON body, ADR-0004).
   - The 403 message is exactly "비밀번호가 일치하지 않습니다".
-- **Page**: `/` is a Client Component that uses only the API above (ADR-0003). It has a write form, the Entry list, and a per-Entry inline panel in mode `edit` (textarea + password) or `delete` (password), with at most one panel open at a time. Errors from the API are shown inline at the form or the Entry that caused them. The Developer credit comes from a single constant, and the developer's real name must be filled in there. Styling uses the Tailwind setup that is already present.
+- **Page**: `/` is a Client Component that uses only the API above (ADR-0003). It has a write form, the Entry list, and a per-Entry inline panel in mode `edit` (textarea + password) or `delete` (password), with at most one panel open per Entry. Errors from the API are shown inline at the form or the Entry that caused them. The Developer credit comes from a single constant, and the developer's real name must be filled in there. Styling uses the Tailwind setup that is already present.
 
 ## Testing Decisions
 

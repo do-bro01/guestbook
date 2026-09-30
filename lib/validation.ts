@@ -64,3 +64,25 @@ export function parseNewEntry(input: unknown): Parsed<NewEntryInput> {
     value: { name: name.value, message: message.value, password: password.value },
   };
 }
+
+export type MessageUpdateInput = { message: string; password: string };
+
+export function parseMessageUpdate(input: unknown): Parsed<MessageUpdateInput> {
+  const body = asBody(input);
+  if (!body) return INVALID_BODY;
+  const message = readMessage(body);
+  if (!message.ok) return message;
+  const password = readPassword(body);
+  if (!password.ok) return password;
+  return { ok: true, value: { message: message.value, password: password.value } };
+}
+
+const PG_INT_MAX = 2_147_483_647;
+
+// A route param that is not a positive integer in Postgres `integer` range
+// cannot name an Entry, so callers answer 404 for null (ADR-0005).
+export function parseEntryId(raw: string): number | null {
+  if (!/^[1-9]\d*$/.test(raw)) return null;
+  const id = Number(raw);
+  return id <= PG_INT_MAX ? id : null;
+}

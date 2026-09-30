@@ -13,3 +13,6 @@ export async function readJson(request: Request): Promise<unknown> {
     return null;
   }
 }
+
+export const NOT_FOUND = "글을 찾을 수 없습니다.";
+export const WRONG_PASSWORD = "비밀번호가 일치하지 않습니다";

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseNewEntry } from "./validation";
+import { parseEntryId, parseMessageUpdate, parseNewEntry } from "./validation";
 
 describe("parseNewEntry", () => {
   it("accepts a valid Entry and trims Author name and Message but not the password", () => {
@@ -35,5 +35,41 @@ describe("parseNewEntry", () => {
     const result = parseNewEntry(body);
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.error).toMatch(/\S/);
+  });
+});
+
+describe("parseMessageUpdate", () => {
+  it("accepts a trimmed Message and the password as typed", () => {
+    expect(parseMessageUpdate({ message: " 고친 글 ", password: "abcd" })).toEqual({
+      ok: true,
+      value: { message: "고친 글", password: "abcd" },
+    });
+  });
+
+  it("ignores an Author name in the body, since only the Message can change", () => {
+    const result = parseMessageUpdate({ name: "other", message: "hi", password: "abcd" });
+    expect(result).toEqual({ ok: true, value: { message: "hi", password: "abcd" } });
+  });
+
+  it.each([
+    ["a missing message", { password: "abcd" }],
+    ["a message over 500 characters", { message: "나".repeat(501), password: "abcd" }],
+    ["a missing password", { message: "hi" }],
+    ["a password under 4 characters", { message: "hi", password: "abc" }],
+  ])("rejects %s", (_label, body) => {
+    expect(parseMessageUpdate(body).ok).toBe(false);
+  });
+});
+
+describe("parseEntryId", () => {
+  it.each([
+    ["1", 1],
+    ["42", 42],
+  ])("accepts %s", (raw, id) => {
+    expect(parseEntryId(raw)).toBe(id);
+  });
+
+  it.each(["0", "-1", "1.5", "abc", "1e3", "", "01", "99999999999"])("rejects %j", (raw) => {
+    expect(parseEntryId(raw)).toBeNull();
   });
 });
