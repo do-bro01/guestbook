@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import type { Entry } from "@/lib/entries";
+import type { ListedEntry } from "@/lib/entries";
+import type { ReactionSummary } from "@/lib/reaction";
 import { MESSAGE_MAX } from "@/lib/validation";
 import { deleteEntry, patchEntry } from "./api";
+import { ReactionButtons } from "./ReactionButtons";
 
 const writtenAtFormat = new Intl.DateTimeFormat("ko-KR", {
   dateStyle: "medium",
@@ -19,7 +21,13 @@ const SUBMIT_LABEL = {
   delete: ["삭제", "삭제 중…"],
 } as const;
 
-export function EntryItem({ entry, onChanged }: { entry: Entry; onChanged: () => void }) {
+type Props = {
+  entry: ListedEntry;
+  onChanged: () => void;
+  onReacted: (id: number, summary: ReactionSummary) => void;
+};
+
+export function EntryItem({ entry, onChanged, onReacted }: Props) {
   const [mode, setMode] = useState<Mode>("view");
   const [message, setMessage] = useState(entry.message);
   const [password, setPassword] = useState("");
@@ -62,13 +70,16 @@ export function EntryItem({ entry, onChanged }: { entry: Entry; onChanged: () =>
       {mode === "view" ? (
         <>
           <p className="whitespace-pre-wrap break-words">{entry.message}</p>
-          <div className="flex justify-end gap-2">
-            <button className="btn-secondary" onClick={() => open("edit")}>
-              수정
-            </button>
-            <button className="btn-secondary" onClick={() => open("delete")}>
-              삭제
-            </button>
+          <div className="flex items-center justify-between gap-2">
+            <ReactionButtons entry={entry} onReacted={onReacted} />
+            <div className="flex gap-2">
+              <button className="btn-secondary" onClick={() => open("edit")}>
+                수정
+              </button>
+              <button className="btn-secondary" onClick={() => open("delete")}>
+                삭제
+              </button>
+            </div>
           </div>
         </>
       ) : (

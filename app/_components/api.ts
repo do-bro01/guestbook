@@ -1,4 +1,5 @@
-import type { Entry } from "@/lib/entries";
+import type { Entry, ListedEntry } from "@/lib/entries";
+import type { ReactionKind, ReactionSummary } from "@/lib/reaction";
 import type { MessageUpdateInput, NewEntryInput, PasswordOnlyInput } from "@/lib/validation";
 
 // Browser-side client for the Entry API (ADR-0003). Every call resolves to
@@ -24,7 +25,7 @@ async function call<T>(url: string, init?: RequestInit): Promise<ApiResult<T>> {
 }
 
 export function fetchEntries() {
-  return call<Entry[]>("/api/entries", { cache: "no-store" });
+  return call<ListedEntry[]>("/api/entries", { cache: "no-store" });
 }
 
 export function postEntry(input: NewEntryInput) {
@@ -37,4 +38,11 @@ export function patchEntry(id: number, input: MessageUpdateInput) {
 
 export function deleteEntry(id: number, input: PasswordOnlyInput) {
   return call<void>(`/api/entries/${id}`, { method: "DELETE", body: JSON.stringify(input) });
+}
+
+export function postReaction(id: number, kind: ReactionKind) {
+  return call<ReactionSummary>(`/api/entries/${id}/reaction`, {
+    method: "POST",
+    body: JSON.stringify({ kind }),
+  });
 }

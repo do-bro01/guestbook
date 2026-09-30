@@ -36,3 +36,12 @@ body {
     @apply rounded-md border border-black/15 px-3 py-1.5 text-sm disabled:opacity-50 dark:border-white/20;
   }
 }
+
+@layer components {
+  .reaction {
+    @apply inline-flex items-center gap-1 rounded-full border border-black/15 px-2.5 py-1 text-xs text-zinc-500 transition-colors hover:border-black/40 disabled:opacity-50 dark:border-white/20 dark:text-zinc-400 dark:hover:border-white/50;
+  }
+  .reaction-pressed {
+    @apply border-foreground bg-foreground/10 font-semibold text-foreground dark:border-foreground dark:text-foreground;
+  }
+}

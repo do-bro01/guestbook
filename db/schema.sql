@@ -9,3 +9,12 @@ CREATE TABLE IF NOT EXISTS entries (
 );
 
 CREATE INDEX IF NOT EXISTS entries_created_at_idx ON entries (created_at DESC, id DESC);
+
+-- One Reaction per (Entry, Voter); deleted with its Entry (ADR-0006).
+CREATE TABLE IF NOT EXISTS reactions (
+  entry_id   integer     NOT NULL REFERENCES entries (id) ON DELETE CASCADE,
+  voter_id   uuid        NOT NULL,
+  kind       text        NOT NULL CHECK (kind IN ('like', 'dislike')),
+  created_at timestamptz NOT NULL DEFAULT now(),
+  PRIMARY KEY (entry_id, voter_id)
+);

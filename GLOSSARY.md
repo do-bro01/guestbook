@@ -24,6 +24,18 @@ _Avoid_: User password, login, credential
 The moment an Entry was first created; editing the Message does not change it.
 _Avoid_: Updated at, posted date
 
+**Reaction**:
+A visitor's single vote on an Entry, either a Like (👍) or a Dislike (👎); a visitor holds at most one Reaction per Entry.
+_Avoid_: Vote, rating, 추천
+
+**Like / Dislike**:
+The two kinds of Reaction.
+_Avoid_: Upvote/downvote, thumbs up/down
+
+**Voter**:
+An anonymous browser that has reacted, recognised again only by an identifier it keeps; it is not a person or an account.
+_Avoid_: User, member, liker
+
 **Developer credit**:
 The fixed line "개발자: <name> (202404193)" shown on the page to identify who built the app.
 _Avoid_: Footer, signature

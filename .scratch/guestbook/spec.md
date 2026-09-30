@@ -77,7 +77,17 @@ One page at `/` shows a form for writing an Entry (Author name, Message, Entry p
 
 ## Out of Scope
 
-Pagination, admin tools, comments, likes, images, accounts and login, password recovery, editing the Author name, edit history or an "updated at" time, rate limiting and spam protection.
+Pagination, admin tools, comments, images, accounts and login, password recovery, editing the Author name, edit history or an "updated at" time, rate limiting and spam protection.
+
+## Addendum: Reactions (added after v1)
+
+Requested by the developer after the first release, which reverses the original "likes are out of scope" line.
+
+- Each Entry shows a 👍 Like count and a 👎 Dislike count as grayscale buttons that match the monochrome design.
+- A Voter holds at most one Reaction per Entry. Pressing the same button again cancels it, and pressing the other one switches it. Only the Voter who reacted can cancel or switch that Reaction (ADR-0006).
+- `POST /api/entries/{id}/reaction` with body `{ kind: "like" | "dislike" }` returns 200 `{ likes, dislikes, myReaction }`. An invalid kind returns 400 and a missing Entry returns 404. It sets the `voter_id` cookie on first use.
+- `GET /api/entries` adds `likes`, `dislikes` and `myReaction` (`"like" | "dislike" | null`, for the calling Voter) to each Entry.
+- Tested with Vitest: the toggle rule (same → cancel, other → switch, none → set), reaction-kind validation and Voter-id validation. The route and SQL are verified by hand with `curl` using two cookie jars.
 
 ## Further Notes
 

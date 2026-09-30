@@ -1,16 +1,17 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import type { Entry } from "@/lib/entries";
+import type { ListedEntry } from "@/lib/entries";
+import type { ReactionSummary } from "@/lib/reaction";
 import { type ApiResult, fetchEntries } from "./api";
 import { EntryForm } from "./EntryForm";
 import { EntryItem } from "./EntryItem";
 
 export function Guestbook() {
-  const [entries, setEntries] = useState<Entry[] | null>(null);
+  const [entries, setEntries] = useState<ListedEntry[] | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
 
-  const applyListResult = useCallback((result: ApiResult<Entry[]>) => {
+  const applyListResult = useCallback((result: ApiResult<ListedEntry[]>) => {
     if (result.ok) {
       setEntries(result.data);
       setLoadError(null);
@@ -20,6 +21,10 @@ export function Guestbook() {
   }, []);
 
   const load = useCallback(async () => applyListResult(await fetchEntries()), [applyListResult]);
+
+  const applyReaction = useCallback((id: number, summary: ReactionSummary) => {
+    setEntries((prev) => prev?.map((e) => (e.id === id ? { ...e, ...summary } : e)) ?? prev);
+  }, []);
 
   useEffect(() => {
     let active = true;
@@ -52,7 +57,12 @@ export function Guestbook() {
         )}
         <ul className="flex flex-col gap-3">
           {entries?.map((entry) => (
-            <EntryItem key={entry.id} entry={entry} onChanged={load} />
+            <EntryItem
+              key={entry.id}
+              entry={entry}
+              onChanged={load}
+              onReacted={applyReaction}
+            />
           ))}
         </ul>
       </section>
