@@ -1,4 +1,5 @@
 import type { Entry } from "@/lib/entries";
+import type { MessageUpdateInput, NewEntryInput, PasswordOnlyInput } from "@/lib/validation";
 
 // Browser-side client for the Entry API (ADR-0003). Every call resolves to
 // either data or a user-facing error message; it never throws.
@@ -26,14 +27,14 @@ export function fetchEntries() {
   return call<Entry[]>("/api/entries", { cache: "no-store" });
 }
 
-export function postEntry(input: { name: string; message: string; password: string }) {
+export function postEntry(input: NewEntryInput) {
   return call<Entry>("/api/entries", { method: "POST", body: JSON.stringify(input) });
 }
 
-export function patchEntry(id: number, input: { message: string; password: string }) {
+export function patchEntry(id: number, input: MessageUpdateInput) {
   return call<Entry>(`/api/entries/${id}`, { method: "PATCH", body: JSON.stringify(input) });
 }
 
-export function deleteEntry(id: number, input: { password: string }) {
+export function deleteEntry(id: number, input: PasswordOnlyInput) {
   return call<void>(`/api/entries/${id}`, { method: "DELETE", body: JSON.stringify(input) });
 }

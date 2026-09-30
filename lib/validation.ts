@@ -77,7 +77,9 @@ export function parseMessageUpdate(input: unknown): Parsed<MessageUpdateInput> {
   return { ok: true, value: { message: message.value, password: password.value } };
 }
 
-export function parsePasswordOnly(input: unknown): Parsed<{ password: string }> {
+export type PasswordOnlyInput = { password: string };
+
+export function parsePasswordOnly(input: unknown): Parsed<PasswordOnlyInput> {
   const body = asBody(input);
   if (!body) return INVALID_BODY;
   const password = readPassword(body);

@@ -10,7 +10,7 @@ export function Guestbook() {
   const [entries, setEntries] = useState<Entry[] | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
 
-  const apply = useCallback((result: ApiResult<Entry[]>) => {
+  const applyListResult = useCallback((result: ApiResult<Entry[]>) => {
     if (result.ok) {
       setEntries(result.data);
       setLoadError(null);
@@ -19,17 +19,17 @@ export function Guestbook() {
     }
   }, []);
 
-  const load = useCallback(async () => apply(await fetchEntries()), [apply]);
+  const load = useCallback(async () => applyListResult(await fetchEntries()), [applyListResult]);
 
   useEffect(() => {
     let active = true;
     fetchEntries().then((result) => {
-      if (active) apply(result);
+      if (active) applyListResult(result);
     });
     return () => {
       active = false;
     };
-  }, [apply]);
+  }, [applyListResult]);
 
   return (
     <div className="flex flex-col gap-6">
